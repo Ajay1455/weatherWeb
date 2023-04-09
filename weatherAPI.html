@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>weather App</title>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            font-family: 'Open sans', sans-serif;
+            background-image: url(https://source.unsplash.com/1600x900/?nature,water);
+        }
+        
+        pre{
+            font-family: 'Open sans', sans-serif;
+        }
+
+        .card { 
+            padding: 2em;
+            width: 100%;
+            max-width: 520px;
+            margin: 1em;
+            
+            
+            background: rgba(0, 0, 0, 0.45);
+            color: white;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+
+        button {
+            margin: 0.5em;
+            border-radius: 50%;
+            border: none;
+            height: 46px;
+            width: 46px;
+            outline: none;
+            background:#7c7c7c2b;
+            cursor: pointer;
+            transition: 0.2s ease-in-out;
+            
+            color: white; 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 10px;
+        }
+
+        .weather {
+            text-align: left;
+        }
+
+        input {
+            border: none;
+            outline: none;
+            padding: 0.5em 1em;
+            border-radius: 18px;
+            background: #7c7c7c2b;
+            color: white;
+            font-family: inherit;
+            font-size: 98%;
+            margin: 0;
+            border: 1px solid rgba(255, 255, 255, 0.18); 
+        }
+
+        button:hover{
+            background: #7c7c7c6b;
+        }
+
+        .description {
+            text-transform: capitalize;
+            margin-left: 2px;
+        }
+
+        .flex {
+            display: flex;
+            align-items: center;
+        }
+
+        h1.temp{
+            margin: 0;
+            margin-bottom: 0.4em;
+        }
+
+        .weather.loading{
+            visibility: hidden;
+            max-height: 20px;
+            position: relative;
+        }
+        .weather.loading:after{
+            visibility:visible ;
+            content: "Loading...";
+            color: white;
+            position: absolute;
+            top: 0;
+            left: 20px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <div class="card">
+        <div class="search">
+            <input type="text" class="Search-bar">
+            <button>
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" height="1.5em"
+                    width="1.5em" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M10.442 10.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z"
+                        clip-rule="evenodd"></path>
+                    <path fill-rule="evenodd"
+                        d="M6.5 12a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM13 6.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
+                        clip-rule="evenodd">
+
+                    </path>
+                </svg>
+            </button>
+            <div class="weather loading">
+                <h2 class="city"><pre> Wather in Rajpura</pre></h2>
+                <div class="temp"><pre> 27°C </pre></div>
+                <div class="flex">
+                    <img style="padding:0 ;" src="http://openweathermap.org/img/wn/04n.png" alt="" class="icon" />
+                    <div class="description">Cloudy</div>
+                </div>
+                <div class="humidity"><pre> Humidity: 60%</pre></div>
+                <div class="wind"><pre> Wind speed: 6.2 km/h</pre></div>
+            </div>
+            </button>
+        </div>
+    </div>
+
+    <script defer>
+        let weather = {
+            apiKey: "c2e5f3af88350884be29f561d104c8ff",
+            fetchweather: function (city) {
+                fetch("http://api.openweathermap.org/data/2.5/weather?q="
+                    + city
+                    + "&units=metric&appid="
+                    + this.apiKey
+                )
+                    .then((response) => response.json())
+                    .then((data) => this.displayWeather(data));
+            },
+            displayWeather: function (data) {
+                const { name } = data; // now this astruct the name from data object of array .
+                const { icon, description } = data.weather[0]; //its an array so we have to call by index
+                const { temp, humidity } = data.main;
+                const { speed } = data.wind;
+                
+                document.querySelector(".city").innerText = "Weather in " + name;
+                document.querySelector(".icon").src = "http://openweathermap.org/img/wn/" + icon + ".png";
+                document.querySelector(".description").innerText = description;
+                document.querySelector(".temp").innerText = temp + " °C";
+                document.querySelector(".humidity").innerText = "Humidity: " + humidity + " %";
+                document.querySelector(".wind").innerText = "Wind Speed: " + speed + " Km/h";
+
+                document.body.style.backgroundImage="url('https://source.unsplash.com/1600x900/?"+ name +"')"
+
+                document.querySelector(".weather").classList.remove("loading")
+            },
+            search:function(){
+                this.fetchweather(document.querySelector(".Search-bar").value);
+            }
+        };
+
+        document.querySelector(".search button")
+        .addEventListener("click",function (){
+            weather.search();
+        })
+
+        document.querySelector('.Search-bar')
+        .addEventListener("keyup",function (even){
+            if(event.key=="Enter"){
+            weather.search();
+        }
+        })
+
+        weather.fetchweather("Rajasthan")
+
+        
+    </script>
+</body>
+
+</html>
